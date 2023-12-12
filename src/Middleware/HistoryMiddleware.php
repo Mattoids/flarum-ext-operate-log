@@ -24,17 +24,17 @@ class HistoryMiddleware implements MiddlewareInterface
         $actor = RequestUtil::getActor($request);
         $userId = Arr::get($actor, 'id');
 
-        if ($this->settings->get('mattoid-money-history.request-type-get')) {
+        if ($this->settings->get('mattoid-operate-log.request-type-get')) {
             $typesAllowed[] = "GET";
         }
-        if ($this->settings->get('mattoid-money-history.request-type-post')) {
+        if ($this->settings->get('mattoid-operate-log.request-type-post')) {
             $typesAllowed[] = "POST";
         }
-        if ($this->settings->get('mattoid-money-history.request-type-put')) {
+        if ($this->settings->get('mattoid-operate-log.request-type-put')) {
             $typesAllowed[] = "PUT";
             $typesAllowed[] = "PATCH";
         }
-        if ($this->settings->get('mattoid-money-history.request-type-delete')) {
+        if ($this->settings->get('mattoid-operate-log.request-type-delete')) {
             $typesAllowed[] = "DELETE";
         }
 
