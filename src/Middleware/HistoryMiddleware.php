@@ -13,6 +13,8 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class HistoryMiddleware implements MiddlewareInterface
 {
+    private $uriAllowed = ['/token'];
+
     public function __construct(SettingsRepositoryInterface $settings)
     {
         $this->settings = $settings;
@@ -40,6 +42,7 @@ class HistoryMiddleware implements MiddlewareInterface
 
         $response = $handler->handle($request);
 
+        app('log')->info($request->getUri());
         if (!in_array($request->getMethod(), $typesAllowed)) {
             return $response;
         }
@@ -48,7 +51,7 @@ class HistoryMiddleware implements MiddlewareInterface
         $operateLog->user_id = $userId;
         $operateLog->method = $request->getMethod();
         $operateLog->uri = $request->getUri();
-        $operateLog->request = json_encode($request->getParsedBody());
+        $operateLog->request = in_array($request->getUri(), $this->uriAllowed) ? '' :json_encode($request->getParsedBody());
         $operateLog->response = $response->getBody();
         $operateLog->save();
 
