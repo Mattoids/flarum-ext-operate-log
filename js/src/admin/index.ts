@@ -30,4 +30,16 @@ app.initializers.add('mattoid-operate-log', () => {
       type: 'switch',
       default: true
     })
+    .registerSetting({
+      setting: 'mattoid-operate-log.save-type',
+      help: "",
+      label: app.translator.trans('mattoid-operate-log.admin.settings.save-type'),
+      type: 'select',
+      options: {
+        '0': app.translator.trans('mattoid-operate-log.admin.saveType.0'),
+        '1': app.translator.trans('mattoid-operate-log.admin.saveType.1'),
+        '2': app.translator.trans('mattoid-operate-log.admin.saveType.2'),
+      },
+      default: '1',
+    })
 });

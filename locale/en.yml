@@ -7,5 +7,11 @@ mattoid-operate-log:
       request-type-put: PUT
       request-type-delete: DELETE
       type-requirement: After checking, this type of data will be recorded
-
+      save-type: Storage location
+    saveType:
+      0: Do not store
+      1: log file
+      2: database
   forum:
+  api:
+    prefix: [operate log]

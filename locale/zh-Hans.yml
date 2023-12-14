@@ -7,5 +7,12 @@ mattoid-operate-log:
       request-type-put: 记录PUT请求
       request-type-delete: 记录DELETE请求
       type-requirement: 勾选后将记录该类型数据
+      save-type: 存储位置
+    saveType:
+      0: 不存储
+      1: 日志文件
+      2: 数据库
 
   forum:
+  api:
+    prefix: 【操作日志】

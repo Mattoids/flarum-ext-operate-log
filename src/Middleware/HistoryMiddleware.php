@@ -5,6 +5,7 @@ namespace Mattoid\OperateLog\Middleware;
 use Flarum\Http\RequestUtil;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Arr;
+use Flarum\Locale\Translator;
 use Mattoid\OperateLog\model\UserOperateLog;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -15,9 +16,13 @@ class HistoryMiddleware implements MiddlewareInterface
 {
     private $uriAllowed = ['/token'];
 
-    public function __construct(SettingsRepositoryInterface $settings)
+    private $settings;
+    private $translator;
+
+    public function __construct(SettingsRepositoryInterface $settings, Translator $translator)
     {
         $this->settings = $settings;
+        $this->translator = $translator;
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
@@ -42,18 +47,30 @@ class HistoryMiddleware implements MiddlewareInterface
 
         $response = $handler->handle($request);
 
-        app('log')->info($request->getUri());
         if (!in_array($request->getMethod(), $typesAllowed)) {
             return $response;
         }
 
-        $operateLog = new UserOperateLog();
-        $operateLog->user_id = $userId;
-        $operateLog->method = $request->getMethod();
-        $operateLog->uri = $request->getUri();
-        $operateLog->request = in_array($request->getUri(), $this->uriAllowed) ? '' :json_encode($request->getParsedBody());
-        $operateLog->response = $response->getBody();
-        $operateLog->save();
+        $operateLog = [
+            "user_id" => isset($userId) ? $userId: 0,
+            "method"  => $request->getMethod(),
+            "uri"     => $request->getUri(),
+            "ip"      => $request->getAttribute("ipAddress"),
+            "request" => in_array($request->getUri(), $this->uriAllowed) ? '' :json_encode($request->getParsedBody()),
+            "response" => $response->getBody(),
+            "created_at" => date('Y-m-d H:i:s')
+        ];
+
+        $saveType = $this->settings->get("mattoid-operate-log.save-type", 1);
+        switch ($saveType) {
+            case 1:
+                app('log')->info($this->translator->trans("mattoid-operate-log.api.prefix") . " " . json_encode($operateLog));
+                break;
+            case 2:
+                UserOperateLog::query()->insert($operateLog);
+                break;
+            default:
+        }
 
         return $response;
     }
